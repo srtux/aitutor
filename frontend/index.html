@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AiTutor - 100% Local Multimodal AI Tutor</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="brand-logo-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+          <circle cx="12" cy="5" r="2"></circle>
+          <path d="M12 7v4"></path>
+          <line x1="8" y1="16" x2="8" y2="16"></line>
+          <line x1="16" y1="16" x2="16" y2="16"></line>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">AiTutor</span>
+        <span class="offline-pill" title="Running hermetically without external API calls">
+          <span class="pulse-dot"></span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          100% Offline Local Edge Mode
+        </span>
+      </div>
+    </div>
+
+    <!-- Cluster of Topbar Controls -->
+    <div class="topbar-controls">
+      <div class="control-group">
+        <label for="model-select" class="visually-hidden">LLM Model</label>
+        <select id="model-select" class="select-input" aria-label="Select Local LLM Model">
+          <option value="qwen2.5:7b-instruct" selected>qwen2.5:7b-instruct</option>
+          <option value="llama3.2:3b">llama3.2:3b</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="topic-select" class="visually-hidden">Lesson Topic</label>
+        <select id="topic-select" class="select-input" aria-label="Select Lesson Topic">
+          <option value="linear_equations" selected>1. Linear Equations &amp; Balancing</option>
+          <option value="python_loops">2. Python Loops &amp; Off-by-One Bugs</option>
+          <option value="fraction_word_problems">3. Fraction Word Problems</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="voice-select" class="visually-hidden">Tutor Voice</label>
+        <select id="voice-select" class="select-input" aria-label="Select Tutor Voice">
+          <option value="warm_mentor" selected>Aria (Warm Mentor)</option>
+          <option value="bright_encourager">Sky (Bright Encourager)</option>
+          <option value="calm_british">Emma (Calm British)</option>
+          <option value="friendly_coach">Puck (Friendly Coach)</option>
+        </select>
+      </div>
+
+      <!-- Theme Switcher Button -->
+      <button id="theme-toggle" class="icon-btn" aria-label="Toggle color theme" title="Toggle dark/light theme">
+        <svg id="theme-icon-sun" class="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg id="theme-icon-moon" class="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+
+      <!-- CSV Export Button -->
+      <button id="export-csv-btn" class="btn btn-secondary" title="Export timestamped frame telemetry for analysis">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        <span>Export CSV</span>
+      </button>
+
+      <!-- Start/Stop Session Button -->
+      <button id="session-btn" class="btn btn-primary" title="Start tutoring session">
+        <svg id="session-icon-start" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>
+        <svg id="session-icon-stop" class="hidden" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+        </svg>
+        <span id="session-btn-text">Start Session</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main 2-Column Split Workspace -->
+  <main class="workspace-grid">
+    <!-- LEFT COLUMN: EMBODIMENT & REAL-TIME SENSING (~42% width) -->
+    <section class="col embodiment-col">
+      <!-- Card 1: Robot Embodiment -->
+      <div class="card embodiment-card">
+        <div class="card-header">
+          <div class="header-left">
+            <span class="card-title">Robot Tutor Embodiment</span>
+          </div>
+          <div class="header-right">
+            <span id="tts-speed-readout" class="pill pill-speed" title="Adaptive Kokoro TTS speech rate">1.00x</span>
+            <span id="state-pill" class="pill state-pill state-confident" title="Current Pedagogical Directive">CONFIDENT_ADVANCE</span>
+          </div>
+        </div>
+        <div id="avatar-stage" class="avatar-stage">
+          <!-- RobotAvatar SVG rendered dynamically here -->
+        </div>
+      </div>
+
+      <!-- Card 2: Webcam PIP & 478-Landmark Face Mesh -->
+      <div class="card webcam-card">
+        <div class="card-header">
+          <div class="header-left">
+            <span class="card-title">Vision Feed</span>
+            <span id="fps-pill" class="pill pill-mono">-- FPS</span>
+          </div>
+          <div class="header-right">
+            <button id="calibrate-btn" type="button" class="pill-btn" title="Calibrate neutral resting face (1.5s)">
+              Calibrate
+            </button>
+            <button id="mesh-toggle-btn" class="pill-btn active" title="Toggle 478-landmark canvas overlay">
+              Face Mesh
+            </button>
+            <span id="vad-status-pill" class="pill vad-pill vad-idle">
+              <span class="status-indicator-dot"></span>
+              <span id="vad-status-text">MIC IDLE</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="video-container">
+          <video id="webcam-video" autoplay playsinline muted></video>
+          <canvas id="mesh-canvas" width="640" height="360"></canvas>
+          <div id="camera-fallback" class="camera-fallback">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+            <span>Webcam &amp; CoreAudio AEC Standby &mdash; Click Start Session</span>
+          </div>
+        </div>
+
+        <!-- Collapsible Lab Affect Simulator Drawer (Default Collapsed) -->
+        <div id="simulator-drawer" class="disclosure-card">
+          <button id="simulator-toggle-btn" class="disclosure-header" aria-expanded="false" title="Click to toggle manual affect simulator sliders">
+            <div class="disclosure-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="21" x2="4" y2="14"></line>
+                <line x1="4" y1="10" x2="4" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12" y2="3"></line>
+                <line x1="20" y1="21" x2="20" y2="16"></line>
+                <line x1="20" y1="12" x2="20" y2="3"></line>
+                <line x1="1" y1="14" x2="7" y2="14"></line>
+                <line x1="9" y1="8" x2="15" y2="8"></line>
+                <line x1="17" y1="16" x2="23" y2="16"></line>
+              </svg>
+              <span>Lab Affect Simulator</span>
+            </div>
+            <div class="disclosure-icon-wrap">
+              <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+          </button>
+
+          <div id="simulator-body" class="disclosure-body sim-body collapsed">
+            <div class="sim-grid">
+              <div class="sim-control">
+                <div class="sim-label-row">
+                  <label for="sim-yaw">Head Yaw</label>
+                  <span id="sim-yaw-val" class="sim-val">0&deg;</span>
+                </div>
+                <input type="range" id="sim-yaw" min="-40" max="40" value="0" step="1">
+              </div>
+
+              <div class="sim-control">
+                <div class="sim-label-row">
+                  <label for="sim-brow">Brow Furrow (AU4)</label>
+                  <span id="sim-brow-val" class="sim-val">0.00</span>
+                </div>
+                <input type="range" id="sim-brow" min="0" max="1" value="0" step="0.02">
+              </div>
+
+              <div class="sim-control">
+                <div class="sim-label-row">
+                  <label for="sim-mouth">Mouth Tension (AU15/24)</label>
+                  <span id="sim-mouth-val" class="sim-val">0.00</span>
+                </div>
+                <input type="range" id="sim-mouth" min="0" max="1" value="0" step="0.02">
+              </div>
+
+              <div class="sim-control">
+                <div class="sim-label-row">
+                  <label for="sim-hesitation">Hesitation</label>
+                  <span id="sim-hesitation-val" class="sim-val">0.0s</span>
+                </div>
+                <input type="range" id="sim-hesitation" min="0" max="10" value="0" step="0.2">
+              </div>
+
+              <div class="sim-control sim-switch-row">
+                <label for="sim-enabled" class="sim-switch-label">Enable Lab Simulator (Mesh Wireframe)</label>
+                <input type="checkbox" id="sim-enabled" class="toggle-switch">
+              </div>
+
+              <div class="sim-control sim-switch-row">
+                <label for="sim-speaking" class="sim-switch-label">Simulate Speaking (VAD Active)</label>
+                <input type="checkbox" id="sim-speaking" class="toggle-switch">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Real-Time Affective Telemetry -->
+      <div class="card telemetry-card">
+        <div class="card-header">
+          <span class="card-title">Affective Telemetry &amp; VAD Masking</span>
+          <span id="pose-val" class="pill pill-mono">Yaw: 0&deg; &middot; Pitch: 0&deg;</span>
+        </div>
+
+        <div class="meter-stack">
+          <!-- Attentiveness -->
+          <div class="meter-row">
+            <div class="meter-info">
+              <span class="meter-label">Attentiveness</span>
+              <span id="attentiveness-val" class="meter-pct">100%</span>
+            </div>
+            <div class="progress-track">
+              <div id="attentiveness-bar" class="progress-fill progress-cyan" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <!-- VAD-Masked Frustration -->
+          <div class="meter-row">
+            <div class="meter-info">
+              <div class="meter-title-wrap">
+                <span class="meter-label">VAD-Masked Frustration</span>
+                <span class="meter-sublabel">(Pedagogical Routing)</span>
+              </div>
+              <span id="frustration-val" class="meter-pct">0%</span>
+            </div>
+            <div class="progress-track">
+              <div id="frustration-bar" class="progress-fill progress-amber" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <!-- Unmasked Frustration (Ablation) -->
+          <div class="meter-row">
+            <div class="meter-info">
+              <div class="meter-title-wrap">
+                <span class="meter-label">Unmasked Frustration</span>
+                <span class="meter-sublabel">(Ablation Baseline)</span>
+              </div>
+              <div class="meter-val-wrap">
+                <span id="unmasked-frustration-val" class="meter-pct">0%</span>
+                <span id="ablation-pill" class="pill pill-ablation">Suppressed: 0%</span>
+              </div>
+            </div>
+            <div class="progress-track">
+              <div id="unmasked-frustration-bar" class="progress-fill progress-rose" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="telemetry-footer">
+          <div class="footer-stat">
+            <span class="stat-name">Hesitation</span>
+            <span id="hesitation-timer" class="stat-data">0.0s</span>
+          </div>
+          <div class="footer-stat">
+            <span class="stat-name">Router Mode</span>
+            <span id="router-mode-badge" class="pill pill-state">CONFIDENT</span>
+          </div>
+          <div class="footer-stat latency-stat">
+            <span class="stat-name">Last Latency</span>
+            <span id="latency-readout" class="stat-data stat-mono">STT -- &middot; LLM -- &middot; TTS -- ms</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT COLUMN: INTERACTIVE WHITEBOARD & DIALOGUE (~58% width) -->
+    <section class="col tutor-col">
+      <!-- Card 1: Interactive Whiteboard -->
+      <div class="card whiteboard-card">
+        <div class="card-header">
+          <div class="header-left">
+            <span id="subject-pill" class="pill pill-subject">Algebra I</span>
+            <h2 id="problem-title" class="whiteboard-title">Balancing Linear Equations</h2>
+          </div>
+          <div class="header-right">
+            <span id="curriculum-status" class="pill pill-status">Active Problem</span>
+          </div>
+        </div>
+
+        <!-- Problem Statement Box -->
+        <div class="problem-container">
+          <div id="problem-display" class="problem-display font-mono">3x + 7 = 22</div>
+        </div>
+
+        <!-- Step-by-Step Breakdown -->
+        <div class="steps-section">
+          <div class="section-label">Step-by-Step Progression</div>
+          <ol id="whiteboard-steps" class="steps-list">
+            <!-- Populated dynamically via curriculum/backend -->
+          </ol>
+        </div>
+
+        <!-- Dynamic Visual Hint Diagram Container -->
+        <div class="diagram-section">
+          <div class="section-label">Dynamic Visual Hint</div>
+          <div id="whiteboard-diagram" class="whiteboard-diagram">
+            <!-- Dynamic SVG diagram: balance_scale, loop_trace, or fraction_bars -->
+          </div>
+          <!-- Clickable Binary Choice Buttons (for FRUSTRATED_SCAFFOLD) -->
+          <div id="binary-choices-container" class="binary-choices-container binary-choice-group hidden">
+            <!-- Dynamically populated buttons -->
+          </div>
+        </div>
+
+        <!-- Socratic Hint Callout Card (Uniform 1px perimeter border, no left stripe) -->
+        <div id="socratic-hint-card" class="socratic-hint-card">
+          <div class="hint-header">
+            <svg class="hint-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18h6"></path>
+              <path d="M10 22h4"></path>
+              <path d="M12 2a7 7 0 0 0-7 7c0 2.5 1.5 4.5 3 6h8c1.5-1.5 3-3.5 3-6a7 7 0 0 0-7-7z"></path>
+            </svg>
+            <span class="hint-title">Socratic Guidance</span>
+          </div>
+          <p id="socratic-hint-text" class="hint-text">
+            Notice how +7 is grouped with 3x on the left side of the equals sign. How can we isolate the term with x?
+          </p>
+        </div>
+      </div>
+
+      <!-- Card 2: Socratic Dialogue Transcript -->
+      <div class="card dialogue-card">
+        <div class="card-header">
+          <div class="header-left">
+            <span class="card-title">Socratic Dialogue Transcript</span>
+          </div>
+          <div class="header-right">
+            <span id="session-status-badge" class="pill pill-idle">Standby</span>
+          </div>
+        </div>
+
+        <!-- Scrollable Turn Log -->
+        <div id="chat-log" class="chat-log">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Bottom Input Bar -->
+        <form id="chat-form" class="chat-input-bar">
+          <input
+            type="text"
+            id="text-prompt"
+            class="chat-text-input"
+            placeholder="Type your answer or speak naturally into your microphone..."
+            autocomplete="off"
+            aria-label="Enter your answer"
+          >
+          <button type="submit" id="send-btn" class="btn btn-primary btn-send" aria-label="Send answer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+            <span>Send</span>
+          </button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

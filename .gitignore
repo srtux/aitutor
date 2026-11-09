@@ -1,0 +1,32 @@
+# Python virtual environment
+.venv/
+env/
+venv/
+
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local models, large weights, and downloaded vendor bundles (fetched via scripts/download_models.py)
+models/*.onnx
+models/*.bin
+models/whisper/
+models/kokoro*
+frontend/assets/*.task
+frontend/vendor/mediapipe/
+
+# OS and Editor artifacts
+.DS_Store
+.vscode/
+.idea/
+
+# Distribution and packaging
+dist/
+build/
+*.egg-info/

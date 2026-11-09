@@ -1,0 +1,4 @@
+pipeline,speech_fp_rate_pct,silent_frust_recall_pct,distraction_premature_rate_pct,sustained_distraction_recall_pct,distraction_latency_s,proactive_fire_s
+unfiltered_frame_by_frame,26.15,100.00,97.98,100.00,0.00,N/A
+unmasked_ema_temporal,23.21,100.00,0.00,100.00,2.80,N/A
+aitutor_vad_masked_temporal,0.00,100.00,0.00,100.00,2.80,32.53
